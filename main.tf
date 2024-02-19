@@ -38,4 +38,4 @@ resource "google_compute_route" "vpc_route" {
   network          = google_compute_network.my_vpc.self_link
   dest_range       = var.route_range
   next_hop_gateway = var.next_hop_gateway
-}
+
