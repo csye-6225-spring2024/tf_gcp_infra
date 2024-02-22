@@ -1,5 +1,7 @@
 # tf-gcp-infra
 
+## Assignment -3
+
 # Infrastructure Setup with Terraform on GCP
 
 This Terraform configuration sets up networking resources on GCP. It creates a Virtual Private Cloud (VPC) with two subnets: webapp and db, and adds a route to vpc.
@@ -35,6 +37,13 @@ In Google Cloud Console—>APIs & Services > Dashboard—>Enable APIs and Servic
 1. 'terraform init' - to initialize Terraform configuration.
 2. 'terraform plan' - to see the execution plan.
 3. 'terraform apply' - to apply the configuration and create the networking resources on GCP.
+
+## Assignment - 4
+
+1. An instance created from the custom image is deployed on our web-app subnet.
+2. Only 8080 port is allowed in our firewall and rest all ports denied using priority
+
+
 
 
 
