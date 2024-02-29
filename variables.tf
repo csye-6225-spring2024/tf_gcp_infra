@@ -114,10 +114,95 @@ variable "instance_name" {
   description = "Name of the instance"
 }
 
-
 variable "priority_allow" {
   description = "Priority allow"
 }
 variable "priority_deny" {
   description = "Priority deny"
+}
+variable "cloudsql_instance_name" {
+  description = "cloudsql instance name"
+}
+variable "delete_protection" {
+  description = "delete protection"
+}
+
+variable "database_version" {
+  description = "database_version"
+}
+
+variable "google_sql_database_disk_type" {
+  description = "google sql database disk type"
+}
+
+variable "google_sql_database_disk_size" {
+  description = "google sql database disk size"
+}
+
+variable "google_sql_database_instance_tier" {
+  description = "google sql database instance tier"
+}
+
+variable "google_sql_database_instance_availability_type" {
+  description = "google sql database instance availability type"
+}
+
+variable "backup_configuration_enabled" {
+  description = "backup configuration enabled"
+}
+
+variable "backup_configuration_binary_log_enabled" {
+  description = "backup configuration_binary_log_enabled"
+}
+
+variable "google_compute_global_address_prefix_length" {
+  description = "prefix_length"
+}
+
+variable "google_compute_address_endpoint" {
+  description = "google compute address endpoint"
+}
+
+variable "google_compute_address_type" {
+  description = "google compute address endpoint"
+}
+
+variable "psc_config_psc_enabled" {
+  description = "psc config psc enabled"
+}
+
+variable "psc_config_ipv4_enabled" {
+  description = "psc config ipv4 enabled"
+}
+
+variable "google_compute_global_address_name" {
+  description = "google compute global address name"
+}
+
+variable "google_compute_global_address_type" {
+  description = "google compute global address type"
+}
+
+variable "google_compute_global_address_purpose" {
+  description = "google compute global address purpose"
+}
+
+variable "google_sql_database_name" {
+  description = "google_sql_database_name"
+}
+
+variable "random_password_length" {
+  description = "random_password_length"
+}
+
+variable "random_password_special" {
+  description = "random_password_special"
+}
+
+variable "google_sql_user" {
+  description = "google_sql_user"
+}
+
+variable "google_service_networking_connection_service" {
+  description = "google_service_networking_connection_service"
 }
