@@ -93,18 +93,18 @@ resource "google_sql_database_instance" "cloudsql_instance" {
     }
   }
 }
-resource "google_compute_global_address" "peer_address" {
-  name          = var.google_compute_global_address_name
-  address_type  = var.google_compute_global_address_type
-  prefix_length = var.google_compute_global_address_prefix_length
-  purpose       = var.google_compute_global_address_purpose
-  network       = google_compute_network.my_vpc.id
-}
-resource "google_service_networking_connection" "private_connection" {
-  network                 = google_compute_network.my_vpc.id
-  service                 = var.google_service_networking_connection_service
-  reserved_peering_ranges = [google_compute_global_address.peer_address.name]
-}
+# resource "google_compute_global_address" "peer_address" {
+#   name          = var.google_compute_global_address_name
+#   address_type  = var.google_compute_global_address_type
+#   prefix_length = var.google_compute_global_address_prefix_length
+#   purpose       = var.google_compute_global_address_purpose
+#   network       = google_compute_network.my_vpc.id
+# }
+# resource "google_service_networking_connection" "private_connection" {
+#   network                 = google_compute_network.my_vpc.id
+#   service                 = var.google_service_networking_connection_service
+#   reserved_peering_ranges = [google_compute_global_address.peer_address.name]
+# }
 resource "google_compute_address" "endpointip" {
   name         = "psc-compute-address-${google_sql_database_instance.cloudsql_instance.name}"
   region       = var.region
@@ -139,6 +139,29 @@ resource "google_sql_user" "cloudsql_user" {
   instance = google_sql_database_instance.cloudsql_instance.name
   password = random_password.database_password.result
 }
+# Create a Service Account
+resource "google_service_account" "my_service_account" {
+  account_id   = var.google_service_account_account_id
+  display_name = var.google_service_account_display_name
+}
+
+resource "google_project_iam_binding" "logging_admin_binding" {
+  project = var.project_id
+  role    = "roles/logging.admin"
+
+  members = [
+    "serviceAccount:${google_service_account.my_service_account.email}"
+  ]
+}
+
+resource "google_project_iam_binding" "monitoring_metric_writer_binding" {
+  project = var.project_id
+  role    = "roles/monitoring.metricWriter"
+
+  members = [
+    "serviceAccount:${google_service_account.my_service_account.email}"
+  ]
+}
 
 # Resource to create instance
 resource "google_compute_instance" "vpc_instance" {
@@ -163,33 +186,63 @@ resource "google_compute_instance" "vpc_instance" {
   depends_on = [
     google_sql_database_instance.cloudsql_instance,
     google_sql_user.cloudsql_user,
-    google_compute_address.endpointip
+    google_compute_address.endpointip,
+    google_service_account.my_service_account,
+    google_project_iam_binding.monitoring_metric_writer_binding,
+    google_project_iam_binding.logging_admin_binding
   ]
 
   metadata_startup_script = <<-EOF
-  
-  #!/bin/bash
-  ENV_FILE="/opt/webapp/.env"
+      
+      #!/bin/bash
+      ENV_FILE="/opt/webapp/.env"
 
-  # Check if the .env file already exists
-  if [ ! -f "$ENV_FILE" ]; then
+      # Check if the .env file already exists
+      if [ ! -f "$ENV_FILE" ]; then
 
-    echo "HOST=${google_compute_address.endpointip.address}" > /opt/webapp/.env
-    echo "DB=${google_sql_database.cloudsql_database.name}" >> /opt/webapp/.env
-    echo "DB_USER=${google_sql_user.cloudsql_user.name}" >> /opt/webapp/.env
-    echo "DB_PASSWORD=${google_sql_user.cloudsql_user.password}" >> /opt/webapp/.env
-    echo "DIALECT=mysql" >> /opt/webapp/.env
+        echo "HOST=${google_compute_address.endpointip.address}" > /opt/webapp/.env
+        echo "DB=${google_sql_database.cloudsql_database.name}" >> /opt/webapp/.env
+        echo "DB_USER=${google_sql_user.cloudsql_user.name}" >> /opt/webapp/.env
+        echo "DB_PASSWORD=${google_sql_user.cloudsql_user.password}" >> /opt/webapp/.env
+        echo "DIALECT=mysql" >> /opt/webapp/.env
+        echo "LOGPATH=/var/log/webapp/myapp.log" >> /opt/webapp/.env
 
-    #sudo ./opt/webapp/packer-config/configure_systemd.sh
-    
-    echo "Environment variables written to $ENV_FILE"
-  else
-      echo "The file $ENV_FILE already exists. Skipping writing environment variables."
-  fi
+        #sudo ./opt/webapp/packer-config/configure_systemd.sh
+        
+        echo "Environment variables written to $ENV_FILE"
+      else
+          echo "The file $ENV_FILE already exists. Skipping writing environment variables."
+      fi
 
-  sudo ./opt/webapp/packer-config/configure_systemd.sh
-  
-  EOF
+      sudo ./opt/webapp/packer-config/configure_systemd.sh
+      
+      EOF
+
+  # resource "google_compute_instance" "vpc_instance" {
+  // Existing configuration for the instance...
+
+  # Attach the service account
+  service_account {
+    email  = google_service_account.my_service_account.email
+    scopes = ["cloud-platform"]
+  }
+
 }
+
+# Add or update A record in Cloud DNS zone
+resource "google_dns_record_set" "webapp_dns_record" {
+  name = var.domain_name
+  type = var.webapp_dns_record_type
+  ttl  = var.ttl
+
+  managed_zone = var.dns_managed_zone
+
+  # The IP address of your VM instance
+  rrdatas = [google_compute_instance.vpc_instance.network_interface.0.access_config.0.nat_ip]
+}
+
+
+
+
 
 

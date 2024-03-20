@@ -206,3 +206,27 @@ variable "google_sql_user" {
 variable "google_service_networking_connection_service" {
   description = "google_service_networking_connection_service"
 }
+variable "dns_managed_zone" {
+  description = "Public zone for managing the dns"
+}
+
+variable "domain_name" {
+  description = "Domain name"
+}
+
+variable "ttl" {
+  description = "ttl"
+}
+
+variable "webapp_dns_record_type" {
+  description = "type"
+}
+
+variable "google_service_account_account_id" {
+  description = "google_service_account_account_id"
+}
+
+variable "google_service_account_display_name" {
+  description = "google_service_account_display_name"
+}
+
