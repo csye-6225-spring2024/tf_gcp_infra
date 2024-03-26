@@ -229,4 +229,53 @@ variable "google_service_account_account_id" {
 variable "google_service_account_display_name" {
   description = "google_service_account_display_name"
 }
+variable "topic_name" {
+  description = "The name of the Pub/Sub topic"
+}
+
+variable "subscription_name" {
+  description = "The name of the Pub/Sub subscription"
+}
+
+variable "service_account_email" {
+  description = "The email address of the service account"
+}
+
+variable "bucket_name" {
+  description = "The name of the Cloud Storage bucket"
+}
+
+variable "source_archive_bucket" {
+  description = "The name of the Cloud Storage bucket where the source code archive is stored"
+}
+
+variable "source_archive_object" {
+  description = "The name of the Cloud Storage object for the source code archive"
+}
+
+variable "function_name" {
+  description = "The name of the Cloud Function"
+}
+
+variable "runtime" {
+  description = "The runtime environment for the Cloud Function"
+}
+
+variable "entry_point" {
+  description = "The entry point for the Cloud Function"
+}
+
+variable "pubsub_role" {
+  description = "The role for Pub/Sub publisher"
+}
+
+variable "iam_service_account_token_role" {
+  description = "The role for IAM service account token creator"
+}
+
+variable "cloud_function_iam_role" {
+  description = "The role for Cloud Functions invoker"
+}
+
+
 

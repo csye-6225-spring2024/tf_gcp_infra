@@ -41,7 +41,7 @@ In Google Cloud Console—>APIs & Services > Dashboard—>Enable APIs and Servic
 ## Assignment - 4
 
 1. An instance created from the custom image is deployed on our web-app subnet.
-2. Only 8080 port is allowed in our firewall and rest all ports denied using priority
+2. Only 8080 port is allowed in our firewall and rest all ports denied using priority.
 
 
 

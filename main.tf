@@ -241,6 +241,95 @@ resource "google_dns_record_set" "webapp_dns_record" {
   rrdatas = [google_compute_instance.vpc_instance.network_interface.0.access_config.0.nat_ip]
 }
 
+# Resource to create Pub/Sub topic
+resource "google_pubsub_topic" "example_topic" {
+  name = var.topic_name
+}
+
+# Resource to create Pub/Sub subscription
+# resource "google_pubsub_subscription" "example_subscription" {
+#   name  = var.subscription_name
+#   topic = google_pubsub_topic.example_topic.name
+
+# }
+
+# Create a service account for Cloud Functions
+# resource "google_service_account" "cloud_function_service_account" {
+#   account_id   = "cloud-function-service-account"
+#   display_name = "Cloud Function Service Account"
+# }
+
+# Grant the necessary permissions to the service account
+resource "google_project_iam_binding" "cloud_function_iam_binding" {
+  project = var.project_id
+  role    = "roles/cloudfunctions.invoker"
+
+  members = [
+    "serviceAccount:${google_service_account.my_service_account.email}"
+  ]
+}
+
+# Create Cloud Function
+resource "google_cloudfunctions_function" "example_function" {
+  name                  = var.function_name
+  runtime               = var.runtime
+  entry_point           = var.entry_point
+  source_archive_bucket = var.source_archive_bucket
+  source_archive_object = var.source_archive_object
+
+  event_trigger {
+    event_type = "google.pubsub.topic.publish"
+    resource   = google_pubsub_topic.example_topic.name
+  }
+
+  available_memory_mb = 256
+  timeout             = "60"
+
+  environment_variables = {
+    BUCKET_NAME = var.bucket_name
+    TOPIC_NAME  = google_pubsub_topic.example_topic.name
+  }
+
+  service_account_email = google_service_account.my_service_account.email
+  vpc_connector         = google_vpc_access_connector.cloud_function_connector.name
+}
+
+resource "google_project_iam_binding" "topic_publisher_binding" {
+  project = var.project_id
+  role    = var.pubsub_role
+
+  members = [
+    "serviceAccount:${google_service_account.my_service_account.email}"
+  ]
+}
+
+# Grant the necessary permissions to the service account used by Cloud Functions
+resource "google_project_iam_binding" "cloud_function_token_creator_binding" {
+  project = var.project_id
+  role    = var.iam_service_account_token_role
+
+  members = [
+    "serviceAccount:${google_service_account.my_service_account.email}"
+  ]
+}
+
+resource "google_vpc_access_connector" "cloud_function_connector" {
+  name          = "cloud-function-connector"
+  network       = "projects/${var.project_id}/global/networks/${var.vpc_name}"
+  ip_cidr_range = "10.0.0.0/28"
+}
+
+resource "google_project_iam_binding" "cloudsql_client_binding" {
+  project = var.project_id
+  role    = "roles/cloudsql.client"
+
+  members = [
+    "serviceAccount:${google_service_account.my_service_account.email}"
+  ]
+}
+
+
+
 
 
 
