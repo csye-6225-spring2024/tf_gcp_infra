@@ -277,5 +277,29 @@ variable "cloud_function_iam_role" {
   description = "The role for Cloud Functions invoker"
 }
 
+variable "google_pubsub_topic_iam_binding_topic_iam_binding_role" {
+  description = "The role for Cloud Functions invoker"
+}
+
+variable "vpc_connector_name" {
+  description = "The name of the VPC connector"
+}
+
+variable "ip_cidr_range" {
+  description = "The IP CIDR range for the VPC connector"
+}
+
+variable "cloud_sql_client_role" {
+  description = "The cloud sql client role"
+}
+
+variable "cloud_function_invoker_role" {
+  description = "IAM role for Cloud Functions"
+}
+
+variable "function_event_trigger_event_type" {
+  description = "Event type for the Cloud Function event trigger"
+}
+
 
 
