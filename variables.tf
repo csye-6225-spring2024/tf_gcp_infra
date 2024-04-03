@@ -120,6 +120,11 @@ variable "priority_allow" {
 variable "priority_deny" {
   description = "Priority deny"
 }
+
+variable "ports_ssh" {
+  description = "IP protocol for the forwarding rule"
+}
+
 variable "cloudsql_instance_name" {
   description = "cloudsql instance name"
 }
@@ -273,9 +278,9 @@ variable "iam_service_account_token_role" {
   description = "The role for IAM service account token creator"
 }
 
-variable "cloud_function_iam_role" {
-  description = "The role for Cloud Functions invoker"
-}
+# variable "cloud_function_iam_role" {
+#   description = "The role for Cloud Functions invoker"
+# }
 
 variable "google_pubsub_topic_iam_binding_topic_iam_binding_role" {
   description = "The role for Cloud Functions invoker"
@@ -300,6 +305,238 @@ variable "cloud_function_invoker_role" {
 variable "function_event_trigger_event_type" {
   description = "Event type for the Cloud Function event trigger"
 }
+
+variable "template_name" {
+  description = "Description for the instance template"
+}
+
+variable "template_description" {
+  description = "Description for the instance template"
+}
+
+variable "machine_type" {
+  description = "Machine type for the instance"
+}
+
+variable "firewall_name" {
+  description = "vpc1-firewall"
+}
+
+variable "disk_size_gb" {
+  description = "Size of the disk in GB"
+}
+
+variable "disk_type" {
+  description = "Type of disk"
+}
+
+# variable "service_account_scopes" {
+#   description = "Scopes for the service account"
+#}
+
+# variable "depends_on_resources" {
+#   description = "Resources that this template depends on"
+# }
+
+# variable "firewall_source_ranges" {
+#   description = "Tags for the instance"
+# }
+
+variable "autoscaler_name" {
+  description = "The name of the autoscaler"
+}
+
+variable "autoscalar_region" {
+  description = "The region for the autoscaler"
+}
+
+# variable "target_instance_group_manager" {
+#   description = "The self link of the target instance group manager"
+# }
+
+variable "max_replicas" {
+  description = "The maximum number of replicas"
+}
+
+variable "min_replicas" {
+  description = "The minimum number of replicas"
+}
+
+variable "cooldown_period" {
+  description = "The cooldown period in seconds"
+}
+
+variable "cpu_target_utilization" {
+  description = "The target CPU utilization"
+}
+
+variable "health_check_name" {
+  description = "The name of the health check"
+}
+
+variable "check_interval_sec" {
+  description = "The interval between health checks in seconds"
+}
+
+variable "timeout_sec" {
+  description = "The timeout for each health check attempt in seconds"
+}
+
+variable "healthy_threshold" {
+  description = "The number of consecutive successful health checks required to mark the backend as healthy"
+}
+
+variable "unhealthy_threshold" {
+  description = "The number of consecutive failed health checks required to mark the backend as unhealthy"
+}
+
+variable "request_path" {
+  description = "The path to use for the HTTP health check request"
+}
+
+variable "port" {
+  description = "The port on the instance to which this health check sends traffic"
+}
+
+variable "port_name" {
+  description = "The name of the port to which this health check sends traffic"
+}
+
+variable "instance_group_manager_name" {
+  description = "The name of the instance group manager"
+}
+
+variable "base_instance_name" {
+  description = "The base instance name"
+}
+
+variable "instance_group_manager_region" {
+  description = "The region where the instance group manager is located"
+}
+
+variable "distribution_policy_zones" {
+  description = "The zones to distribute instances for the instance group manager"
+}
+
+variable "named_port_name" {
+  description = "named port name"
+}
+
+variable "named_port_port" {
+  description = "named port port"
+}
+
+variable "auto_healing_policies_initial_delay_sec" {
+  description = "named port port"
+}
+
+variable "ssl_certificate_name" {
+  description = "The name of the SSL certificate"
+}
+
+variable "ssl_certificate_domains" {
+  description = "The list of domains for the SSL certificate"
+}
+
+variable "google_compute_target_https_proxy_lb_target_proxy" {
+  description = "named port port"
+}
+variable "lb-url-map" {
+  description = "lb-url-map"
+}
+
+variable "backend_service_name" {
+  description = "The name of the backend service"
+}
+
+variable "load_balancing_scheme" {
+  description = "The load balancing scheme for the backend service"
+}
+
+# variable "health_check_links" {
+#   description = "List of health check links for the backend service"
+# }
+
+variable "backend_protocol" {
+  description = "The protocol for the backend service"
+}
+
+variable "backend_port_name" {
+  description = "The port name for the backend service"
+}
+
+variable "health_check_name_1" {
+  description = "Name of the health check"
+}
+
+variable "check_interval_sec_1" {
+  description = "Interval between health checks in seconds"
+}
+
+variable "timeout_sec_1" {
+  description = "Timeout for each health check request in seconds"
+}
+
+variable "health_check_port_1" {
+  description = "Port to use for the health check"
+}
+
+variable "health_check_request_path" {
+  description = "The path to use for the health check request"
+}
+variable "forwarding_rule_name" {
+  description = "Name of the forwarding rule"
+}
+
+variable "forwarding_rule_port_range" {
+  description = "Port range for the forwarding rule"
+}
+
+variable "load_balancing_scheme_2" {
+  description = "Load balancing scheme for the forwarding rule"
+}
+
+variable "ip_protocol" {
+  description = "IP protocol for the forwarding rule"
+}
+
+variable "action_on_failure" {
+  description = "IP protocol for the forwarding rule"
+}
+
+variable "mailgun_domain" {
+  description = "The domain used for Mailgun"
+}
+
+variable "mail_sender" {
+  description = "The sender email address"
+}
+
+variable "base_url" {
+  description = "The base URL"
+}
+
+variable "mailgun_api" {
+  description = "The domain used for Mailgun"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
