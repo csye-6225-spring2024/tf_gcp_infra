@@ -503,7 +503,6 @@ variable "ip_protocol" {
 variable "action_on_failure" {
   description = "IP protocol for the forwarding rule"
 }
-
 variable "mailgun_domain" {
   description = "The domain used for Mailgun"
 }
@@ -519,6 +518,69 @@ variable "base_url" {
 variable "mailgun_api" {
   description = "The domain used for Mailgun"
 }
+variable "key_ring_name" {
+  type = string
+}
+
+variable "storage_crypto_key_name" {
+  type = string
+}
+
+variable "storage_rotation_period" {
+  type = string
+}
+
+variable "my-bucket_name" {
+  type = string
+}
+
+variable "bucket_location" {
+  type = string
+}
+
+variable "my_object_name" {
+  type = string
+}
+
+variable "my_object_source" {
+  type = string
+}
+
+variable "iam_role" {
+  type = string
+}
+
+variable "vm_crypto_key_name" {
+  type    = string
+}
+
+variable "vm_rotation_period" {
+  type    = string
+}
+
+variable "cloudsql_crypto_key_name" {
+  type    = string
+}
+
+variable "cloudsql_rotation_period" {
+  type    = string
+}
+
+variable "service_name" {
+  type    = string
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
