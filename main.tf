@@ -67,7 +67,7 @@ resource "google_compute_firewall" "deny-ssh" {
   network = google_compute_network.my_vpc.self_link
   # priority = var.priority_deny
 
-  deny {
+  allow {
     protocol = var.protocol_ssh
     ports    = var.ports_ssh
   }
@@ -82,6 +82,7 @@ resource "google_sql_database_instance" "cloudsql_instance" {
   deletion_protection = var.delete_protection
   region              = var.region
   database_version    = var.database_version
+  encryption_key_name = google_kms_crypto_key.cloudsql_crypto_key.id
 
   settings {
     tier              = var.google_sql_database_instance_tier
@@ -101,6 +102,10 @@ resource "google_sql_database_instance" "cloudsql_instance" {
       ipv4_enabled = var.psc_config_ipv4_enabled
     }
   }
+  # depends_on = [
+  #   google_kms_crypto_key.cloudsql_crypto_key
+
+  # ]
 }
 # resource "google_compute_global_address" "peer_address" {
 #   name          = var.google_compute_global_address_name
@@ -388,6 +393,9 @@ resource "google_compute_region_instance_template" "instance_template" {
     source_image = var.instance_name
     disk_size_gb = var.disk_size_gb
     disk_type    = var.disk_type
+    disk_encryption_key {
+      kms_key_self_link = google_kms_crypto_key.vm_crypto_key.id
+    }
   }
 
   network_interface {
@@ -490,7 +498,7 @@ resource "google_compute_region_instance_group_manager" "appserver" {
 
   instance_lifecycle_policy {
     //force_update_on_repair = "YES"
-    default_action_on_failure = var.action_on_failure
+    //default_action_on_failure = var.action_on_failure
   }
 
   auto_healing_policies {
@@ -562,4 +570,106 @@ resource "google_compute_global_forwarding_rule" "lb_forwarding_rule" {
   ip_protocol           = var.ip_protocol
 }
 
+resource "google_kms_key_ring" "my_key_ring" {
+  name     = var.key_ring_name
+  location = var.region
+}
 
+resource "google_kms_crypto_key" "storage_crypto_key" {
+  name            = var.storage_crypto_key_name
+  key_ring        = google_kms_key_ring.my_key_ring.id
+  rotation_period = var.storage_rotation_period
+
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+
+resource "google_storage_bucket" "my_bucket" {
+  name          = var.my-bucket_name
+  location      = var.region
+  force_destroy = true
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    condition {
+      age = 30
+    }
+
+    action {
+      type = "Delete"
+    }
+  }
+
+  encryption {
+    default_kms_key_name = google_kms_crypto_key.storage_crypto_key.id
+  }
+
+  depends_on = [
+    google_service_account.my_service_account,
+    //google_project_iam_binding.storage_admin_binding,
+    google_kms_crypto_key.storage_crypto_key,
+    google_kms_crypto_key_iam_binding.storage_crypto_key_binding
+  ]
+}
+
+resource "google_storage_bucket_object" "example_object" {
+  name   = var.my_object_name
+  bucket = google_storage_bucket.my_bucket.name
+  source = var.my_object_source
+}
+
+data "google_storage_project_service_account" "gcs_account" {
+}
+
+resource "google_kms_crypto_key_iam_binding" "storage_crypto_key_binding" {
+  crypto_key_id = google_kms_crypto_key.storage_crypto_key.id
+  role          = var.iam_role
+
+  members = ["serviceAccount:service-567928947423@gs-project-accounts.iam.gserviceaccount.com"]
+}
+
+
+resource "google_kms_crypto_key" "vm_crypto_key" {
+  name            = var.vm_crypto_key_name
+  key_ring        = google_kms_key_ring.my_key_ring.id
+  rotation_period = var.vm_rotation_period
+
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+resource "google_kms_crypto_key_iam_binding" "crypto_key_template" {
+  crypto_key_id = google_kms_crypto_key.vm_crypto_key.id
+  role          = var.iam_role
+  members       = ["serviceAccount:service-567928947423@compute-system.iam.gserviceaccount.com"]
+  depends_on    = [google_kms_crypto_key.vm_crypto_key]
+}
+
+resource "google_kms_crypto_key" "cloudsql_crypto_key" {
+  name            = var.cloudsql_crypto_key_name
+  key_ring        = google_kms_key_ring.my_key_ring.id
+  rotation_period = var.cloudsql_rotation_period
+
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+resource "google_project_service_identity" "gcp_sa_cloud_sql" {
+  provider = google-beta
+  project  = var.project_id
+  service  = var.service_name
+}
+
+resource "google_kms_crypto_key_iam_binding" "crypto_key_sql" {
+  crypto_key_id = google_kms_crypto_key.cloudsql_crypto_key.id
+  role          = var.iam_role
+  members       = ["serviceAccount:${google_project_service_identity.gcp_sa_cloud_sql.email}"]
+  depends_on    = [google_kms_crypto_key.cloudsql_crypto_key]
+}
